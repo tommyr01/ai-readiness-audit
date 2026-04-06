@@ -86,5 +86,23 @@ ${openText ? `Specific automation request: ${openText}` : ''}
     }
   }
 
+  // Enforce strictly escalating timeSaved: extract numeric hours, sort ascending,
+  // reassign back so QUICK_WIN < MEDIUM_BUILD < FULL_PROJECT always holds.
+  const parseHours = (s: string) => parseFloat(s.replace(/[^0-9.]/g, '')) || 0
+  const effortOrder: EffortLevel[] = ['QUICK_WIN', 'MEDIUM_BUILD', 'FULL_PROJECT']
+  const sortedHours = parsed.opportunities
+    .map(o => parseHours(o.timeSaved))
+    .sort((a, b) => a - b)
+
+  // Ensure values are strictly increasing (no ties)
+  for (let i = 1; i < sortedHours.length; i++) {
+    if (sortedHours[i] <= sortedHours[i - 1]) sortedHours[i] = sortedHours[i - 1] + 1
+  }
+
+  effortOrder.forEach((effort, i) => {
+    const opp = parsed.opportunities.find(o => o.effortLevel === effort)
+    if (opp) opp.timeSaved = `~${sortedHours[i]} hrs/week`
+  })
+
   return parsed
 }
