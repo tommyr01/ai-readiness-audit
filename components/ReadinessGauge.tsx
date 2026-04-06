@@ -50,10 +50,12 @@ export default function ReadinessGauge({ score }: Props) {
   const arcY = (angle: number) => cy + radius * Math.sin(toRad(angle))
 
   const bgPath = `M ${arcX(startAngle)} ${arcY(startAngle)} A ${radius} ${radius} 0 1 1 ${arcX(endAngle)} ${arcY(endAngle)}`
-  const progress = displayed / 100
+  const progress = Math.min(1, Math.max(0, displayed / 100))
   const currentAngle = startAngle + totalAngle * progress
+  const arcDegrees = totalAngle * progress
+  const largeArcFlag = arcDegrees > 180 ? 1 : 0
   const fgPath = progress > 0
-    ? `M ${arcX(startAngle)} ${arcY(startAngle)} A ${radius} ${radius} 0 ${progress > 0.5 ? 1 : 0} 1 ${arcX(currentAngle)} ${arcY(currentAngle)}`
+    ? `M ${arcX(startAngle)} ${arcY(startAngle)} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${arcX(currentAngle)} ${arcY(currentAngle)}`
     : ''
 
   return (
