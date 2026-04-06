@@ -53,7 +53,7 @@ ${openText ? `Specific automation request: ${openText}` : ''}
 
   const message = await client.messages.create({
     model: 'claude-sonnet-4-20250514',
-    max_tokens: 1024,
+    max_tokens: 2048,
     system: SYSTEM_PROMPT,
     messages: [
       {
@@ -79,17 +79,17 @@ ${openText ? `Specific automation request: ${openText}` : ''}
 
   parsed.score = Math.max(0, Math.min(100, Math.round(parsed.score)))
 
-  const validEffort: EffortLevel[] = ['QUICK_WIN', 'MEDIUM_BUILD', 'FULL_PROJECT']
-  for (const opp of parsed.opportunities) {
-    if (!validEffort.includes(opp.effortLevel)) {
-      opp.effortLevel = 'MEDIUM_BUILD'
-    }
-  }
-
-  // Enforce strictly escalating timeSaved: extract numeric hours, sort ascending,
-  // reassign back so QUICK_WIN < MEDIUM_BUILD < FULL_PROJECT always holds.
-  const parseHours = (s: string) => parseFloat(s.replace(/[^0-9.]/g, '')) || 0
+  // Enforce exactly one of each effort level; fall back gracefully if Claude deviates
   const effortOrder: EffortLevel[] = ['QUICK_WIN', 'MEDIUM_BUILD', 'FULL_PROJECT']
+  effortOrder.forEach((effort, i) => {
+    const matches = parsed.opportunities.filter(o => o.effortLevel === effort)
+    if (matches.length === 0) parsed.opportunities[i].effortLevel = effort
+    if (matches.length > 1) matches.slice(1).forEach((o, j) => { o.effortLevel = effortOrder[Math.min(i + j + 1, 2)] })
+  })
+
+  // Enforce strictly escalating timeSaved: take the first number from each string
+  // (handles ranges like "~1.5–2 hrs/week" safely), sort ascending, reassign in order.
+  const parseHours = (s: string) => parseFloat(s.match(/[\d.]+/)?.[0] ?? '') || 0
   const sortedHours = parsed.opportunities
     .map(o => parseHours(o.timeSaved))
     .sort((a, b) => a - b)
