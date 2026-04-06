@@ -71,7 +71,7 @@ export default function ReadinessGauge({ score }: Props) {
           <span className="text-5xl font-black tabular-nums" style={{ color }}>
             {displayed}
           </span>
-          <span className="text-xs font-bold tracking-widest mt-1" style={{ color }}>
+          <span className="text-[10px] font-bold tracking-wide mt-1 w-full text-center px-1" style={{ color }}>
             {label}
           </span>
         </div>
