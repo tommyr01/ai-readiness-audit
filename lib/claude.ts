@@ -31,7 +31,7 @@ Rules:
 - DO NOT introduce AI/Claude API unless it genuinely solves the user's stated problem. Only use it in the FULL_PROJECT if it adds clear value beyond what APIs and Python alone can do.
 - Score should be 70–100 for clear pain + daily frequency, 40–69 for moderate, 0–39 for low volume
 - buildApproach must reference specific tools the user mentioned (from the "tools used" field) plus Tommy's stack. Never generic terms.
-- timeSaved should escalate across the 3 cards — QUICK_WIN lowest, FULL_PROJECT highest
+- timeSaved MUST strictly escalate: FULL_PROJECT > MEDIUM_BUILD > QUICK_WIN. No exceptions. If you are tempted to assign a lower number to a later card, increase it instead.
 - If openText is provided, make sure at least one opportunity directly addresses it
 - headline should reference their businessType field (e.g. "agencies like yours", "e-commerce teams")`
 
